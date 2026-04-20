@@ -40,14 +40,6 @@ Kitchen Compass supports:
 - per-store weekly deal brief stubs
 - a combined weekly deal sheet grouped by category
 
-Current grouped output categories:
-- meat
-- starch
-- dairy
-- fruit-veg
-- beverages
-- misc
-
 Display format is intentionally simple:
 
 `Store — Product — Sale Price — Normal Price`
