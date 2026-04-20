@@ -1,0 +1,106 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import json
+from datetime import date
+from pathlib import Path
+from typing import Any
+
+from food_brain_contract import HISTORY_EVENT_TYPES
+from food_brain_paths import FoodBrainPaths, resolve_data_root
+
+
+def load_catalog(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        raise SystemExit(f"Missing catalog: {path}. Run build_recipe_query_index.py first.")
+    return json.loads(path.read_text())
+
+
+def recipe_lookup(payload: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {recipe["slug"]: recipe for recipe in payload.get("recipes", [])}
+
+
+def normalize_recipe_slug(raw: str, payload: dict[str, Any]) -> str:
+    recipes = recipe_lookup(payload)
+    candidate = raw.strip().lower()
+    if candidate in recipes:
+        return candidate
+
+    title_match = {recipe["title"].lower(): recipe["slug"] for recipe in payload.get("recipes", [])}
+    if candidate in title_match:
+        return title_match[candidate]
+
+    raise SystemExit(f"Unknown recipe '{raw}'. Use a known slug from the query catalog.")
+
+
+def read_events(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    events: list[dict[str, Any]] = []
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if not line or line == "[]":
+            continue
+        events.append(json.loads(line))
+    return events
+
+
+def append_event(path: Path, event: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    existing = path.read_text() if path.exists() else ""
+    if existing.strip() == "[]":
+        existing = ""
+    with path.open("a", encoding="utf-8") as handle:
+        if existing and not existing.endswith("\n"):
+            handle.write("\n")
+        handle.write(json.dumps(event, sort_keys=True) + "\n")
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Record simple Kitchen Compass meal history events.")
+    parser.add_argument("--data-root", help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.")
+    parser.add_argument("--history-file", help="Override the history JSONL path.")
+    parser.add_argument("--event-type", choices=list(HISTORY_EVENT_TYPES))
+    parser.add_argument("--recipe", help="Recipe slug or exact title from the Kitchen Compass catalog.")
+    parser.add_argument("--date", default=date.today().isoformat())
+    parser.add_argument("--meal-slot", default="dinner")
+    parser.add_argument("--source", default="manual")
+    parser.add_argument("--notes", default="")
+    parser.add_argument("--show", action="store_true", help="Show recent events instead of appending a new one.")
+    parser.add_argument("--limit", type=int, default=20)
+    return parser
+
+
+def main() -> None:
+    args = build_parser().parse_args()
+    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root))
+    history_path = Path(args.history_file).expanduser().resolve() if args.history_file else paths.history_file
+
+    if args.show:
+        events = read_events(history_path)
+        for event in events[-args.limit :]:
+            print(json.dumps(event, indent=2, sort_keys=True))
+        return
+
+    if not args.event_type or not args.recipe:
+        raise SystemExit("--event-type and --recipe are required unless using --show")
+
+    payload = load_catalog(paths.generated_query_dir / "recipe-catalog.json")
+    recipe_slug = normalize_recipe_slug(args.recipe, payload)
+    event = {
+        "date": args.date,
+        "event_type": args.event_type,
+        "meal_slot": args.meal_slot,
+        "recipe_slug": recipe_slug,
+        "source": args.source,
+    }
+    if args.notes:
+        event["notes"] = args.notes
+
+    append_event(history_path, event)
+    print(json.dumps(event, indent=2, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
