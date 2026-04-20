@@ -190,7 +190,14 @@ def load_inventory_state(paths: FoodBrainPaths) -> dict[str, Any]:
     path = paths.inventory_items_file
     if not path.exists():
         return ensure_inventory_state_shape()
-    return ensure_inventory_state_shape(json.loads(path.read_text()))
+    payload = json.loads(path.read_text())
+    version = payload.get("version")
+    if version is not None and version != INVENTORY_SCHEMA_VERSION:
+        raise SystemExit(
+            f"{path}: inventory schema version {version} is not supported "
+            f"(this engine reads version {INVENTORY_SCHEMA_VERSION})."
+        )
+    return ensure_inventory_state_shape(payload)
 
 
 
