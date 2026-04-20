@@ -2,13 +2,12 @@
 
 Kitchen Compass is a portable household meal-planning skill focused on three practical jobs:
 
-- **plan dinners** from a reusable recipe catalog
-- **remember inventory** without pretending to track it automatically
-- **surface weekly store deals** in a manual/guided, retailer-aware workflow
+- **store all your recipes digitally**, making them accessible and manipulable via chat
+- **plan dinners** each week tailored to your preferences logically
+- **surface weekly deals** at grocers you frequent to reduce costs and manual effort
+- optionally, it can also help you **track and utilize your existing freezer inventory**
 
-It is designed as a reusable skill/engine. Household-specific live data stays outside the published skill.
-
-## What it does today
+## What it does
 
 ### 1. Weekly dinner planning
 Kitchen Compass can build weekly dinner plans from a structured recipe catalog and household preferences.
@@ -18,22 +17,22 @@ Core planning behavior includes:
 - history-aware shaping
 - optional inventory influence
 - plain-language planner explanations
+- food category and pairing awareness
 
 ### 2. Inventory-aware planning
-Inventory is a real signal in the planner.
+If opted into, inventory can be a real signal to the planner.
 
 Kitchen Compass supports:
 - structured remembered inventory state
 - explicit add / set / confirmed-use flows
 - a boolean `planning.prioritize_inventory` toggle
-- planner explanations when inventory helped
 
-It does **not** pretend to track inventory in real time.
+Note: it does track inventory *automatically*, but relies on the user telling it when an item has been consumed.
 
-### 3. Manual/guided weekly deal workflow
+### 3. Weekly deal workflow
 Deals are **not** planner scoring input.
 
-Instead, Kitchen Compass supports:
+Kitchen Compass supports:
 - saved store definitions
 - saved source URLs
 - per-store `retrieval_recipe` notes for brittle retailer-specific flows
@@ -63,10 +62,8 @@ Kitchen Compass is honest about what is manual versus automated.
 - support manual/guided curation cleanly
 
 ### It does not
-- promise universal autonomous retailer scraping
-- pretend every store works the same way
-- silently change meal plans based on deals
-- hide brittle store-specific retrieval behavior
+- provide universal autonomous retailer deal scraping
+- wash your car
 
 ## Important directories
 
@@ -120,21 +117,3 @@ python3 scripts/prepare_weekly_deal_scan.py --data-root ~/kitchen-compass-data -
 ```bash
 python3 scripts/render_combined_weekly_deal_sheet.py --data-root ~/kitchen-compass-data
 ```
-
-## Publish truth
-This repo contains the **canonical portable skill only**.
-
-It intentionally excludes:
-- private household data
-- live personal store setup
-- daily notes / memory
-- other workspace-specific context
-
-## Status
-Kitchen Compass is publishable as a **manual/guided MVP**.
-
-That means:
-- the data model is real
-- the workflow is real
-- the boundaries are explicit
-- retailer-specific brittleness is acknowledged rather than hidden
