@@ -1,7 +1,7 @@
 # Kitchen Compass recipe schema
 
 This is the human-readable recipe contract for authored markdown files.
-The portable scripts share the same machine-used labels, enums, and composition values through `scripts/food_brain_contract.py`; keep this reference aligned with that file.
+The portable scripts share the same machine-used labels, enums, and composition values through `scripts/contract.py`; keep this reference aligned with that file.
 
 ## Canonical section order
 

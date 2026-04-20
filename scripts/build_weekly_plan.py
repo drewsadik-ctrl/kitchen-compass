@@ -8,8 +8,8 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
-from food_brain_inventory import load_inventory_state, recipe_inventory_support
-from food_brain_paths import FoodBrainPaths, resolve_data_root
+from inventory import load_inventory_state, recipe_inventory_support
+from paths import FoodBrainPaths, resolve_data_root
 
 EFFORT_ORDER = {"easy": 0, "moderate": 1, "involved": 2}
 FRICTION_ORDER = {"low": 0, "medium": 1, "high": 2}

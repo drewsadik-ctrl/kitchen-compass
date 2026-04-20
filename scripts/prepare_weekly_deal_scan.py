@@ -7,14 +7,14 @@ from copy import deepcopy
 from datetime import date
 from pathlib import Path
 
-from food_brain_deals import (
+from deals import (
     deal_store_by_id,
     default_weekly_deal_store_ids,
     load_stores_config,
     normalize_brief_source,
     save_weekly_deal_input,
 )
-from food_brain_paths import FoodBrainPaths, resolve_data_root
+from paths import FoodBrainPaths, resolve_data_root
 
 
 def build_store_brief_stub(week_of: str, store: dict) -> dict:

@@ -5,7 +5,7 @@ import argparse
 import json
 from pathlib import Path
 
-from food_brain_deals import (
+from deals import (
     combine_weekly_deal_briefs,
     default_weekly_deal_store_ids,
     load_stores_config,
@@ -13,7 +13,7 @@ from food_brain_deals import (
     normalize_weekly_deal_input,
     render_combined_weekly_deal_sheet_markdown,
 )
-from food_brain_paths import FoodBrainPaths, resolve_data_root
+from paths import FoodBrainPaths, resolve_data_root
 
 
 

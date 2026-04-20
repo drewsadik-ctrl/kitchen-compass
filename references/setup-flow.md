@@ -4,7 +4,7 @@
 Create a portable Kitchen Compass user-data root that stays separate from the skill itself.
 
 ## Shell assumption
-Run the bundled scripts from the installed `food-brain` skill directory:
+Run the bundled scripts from the installed `kitchen-compass` skill directory:
 
 ```bash
 cd /path/to/kitchen-compass

@@ -8,7 +8,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from food_brain_contract import (
+from contract import (
     ACTIVE_ENGINE_MEAL_TYPES,
     COMPOSITION_NORMALIZATION_ALIASES,
     LIST_FIELDS,
@@ -20,7 +20,7 @@ from food_brain_contract import (
     snapshot_fields_with_defaults,
     split_list,
 )
-from food_brain_paths import FoodBrainPaths, resolve_data_root
+from paths import FoodBrainPaths, resolve_data_root
 
 PROTEIN_KEYWORDS = {
     "chicken", "sausage", "beef", "pork", "steak", "shrimp", "fish", "salmon", "cod",

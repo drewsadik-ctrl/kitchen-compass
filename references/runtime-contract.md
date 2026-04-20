@@ -1,7 +1,7 @@
 # Kitchen Compass runtime contract
 
 This is the human-readable runtime contract for the portable skill.
-Shared machine-used constants live in `scripts/food_brain_contract.py`; keep runtime docs aligned with the shipped scripts.
+Shared machine-used constants live in `scripts/contract.py`; keep runtime docs aligned with the shipped scripts.
 
 ## Active v1 scope
 

@@ -5,8 +5,8 @@ import argparse
 import json
 from copy import deepcopy
 
-from food_brain_contract import INVENTORY_KINDS, INVENTORY_LOCATIONS, INVENTORY_PRIORITIES
-from food_brain_inventory import (
+from contract import INVENTORY_KINDS, INVENTORY_LOCATIONS, INVENTORY_PRIORITIES
+from inventory import (
     append_inventory_transaction,
     build_transaction,
     ensure_unique_item_id,
@@ -20,7 +20,7 @@ from food_brain_inventory import (
     slugify,
     subtract_quantity,
 )
-from food_brain_paths import FoodBrainPaths, resolve_data_root
+from paths import FoodBrainPaths, resolve_data_root
 
 
 

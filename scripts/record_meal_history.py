@@ -7,8 +7,8 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from food_brain_contract import HISTORY_EVENT_TYPES
-from food_brain_paths import FoodBrainPaths, resolve_data_root
+from contract import HISTORY_EVENT_TYPES
+from paths import FoodBrainPaths, resolve_data_root
 
 
 def load_catalog(path: Path) -> dict[str, Any]:

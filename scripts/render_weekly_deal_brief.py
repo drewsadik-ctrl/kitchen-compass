@@ -5,12 +5,12 @@ import argparse
 import json
 from pathlib import Path
 
-from food_brain_deals import (
+from deals import (
     load_stores_config,
     normalize_weekly_deal_input,
     render_weekly_deal_brief_markdown,
 )
-from food_brain_paths import FoodBrainPaths, resolve_data_root
+from paths import FoodBrainPaths, resolve_data_root
 
 
 

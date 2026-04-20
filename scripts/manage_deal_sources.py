@@ -5,8 +5,8 @@ import argparse
 import json
 from copy import deepcopy
 
-from food_brain_contract import WEEKLY_DEAL_SOURCE_TYPES, WEEKLY_DEAL_STORE_STATUSES
-from food_brain_deals import (
+from contract import WEEKLY_DEAL_SOURCE_TYPES, WEEKLY_DEAL_STORE_STATUSES
+from deals import (
     deal_store_by_id,
     ensure_stores_config_shape,
     load_raw_stores_config,
@@ -18,7 +18,7 @@ from food_brain_deals import (
     slugify,
     validate_stores_config,
 )
-from food_brain_paths import FoodBrainPaths, resolve_data_root
+from paths import FoodBrainPaths, resolve_data_root
 
 
 SOURCE_HELP = "One of: " + ", ".join(WEEKLY_DEAL_SOURCE_TYPES)

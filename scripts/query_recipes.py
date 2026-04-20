@@ -6,8 +6,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from food_brain_contract import ACTIVE_ENGINE_MEAL_TYPES, ENUM_CHOICES
-from food_brain_paths import FoodBrainPaths, resolve_data_root
+from contract import ACTIVE_ENGINE_MEAL_TYPES, ENUM_CHOICES
+from paths import FoodBrainPaths, resolve_data_root
 
 
 def load_catalog(path: Path) -> dict[str, Any]:

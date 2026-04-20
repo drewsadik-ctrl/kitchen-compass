@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from food_brain_contract import (
+from contract import (
     WEEKLY_DEAL_BRIEF_SCHEMA_VERSION,
     WEEKLY_DEAL_DISCOUNT_BASES,
     WEEKLY_DEAL_DISPLAY_CATEGORIES,
@@ -16,7 +16,7 @@ from food_brain_contract import (
     WEEKLY_DEAL_SOURCE_TYPES,
     WEEKLY_DEAL_STORE_STATUSES,
 )
-from food_brain_paths import FoodBrainPaths
+from paths import FoodBrainPaths
 
 NON_WORD_RE = re.compile(r"[^a-z0-9]+")
 URL_RE = re.compile(r"^https?://", re.IGNORECASE)

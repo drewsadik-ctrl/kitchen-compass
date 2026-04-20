@@ -1,5 +1,5 @@
 ---
-name: food-brain
+name: kitchen-compass
 description: Build and operate a portable Kitchen Compass meal-planning workspace. Use when setting up a Kitchen Compass household data root, converting recipes into the Kitchen Compass markdown contract, building/querying the dinner-and-side catalog, generating weekly dinner plans, or recording meal history without mixing the reusable engine with household-specific data.
 ---
 
@@ -15,7 +15,7 @@ Use this skill to keep the reusable Kitchen Compass engine separate from househo
 - Treat the installed skill directory as the canonical source for portable engine logic, templates, and contract docs. If a separate live or development copy exists, sync changes deliberately instead of editing both copies independently.
 - Preserve the frozen recipe contract. Exact recipe labels, section order, enum sets, and composition semantics live in `references/recipe-schema.md`.
 - Preserve runtime assumptions and history shape from `references/runtime-contract.md`.
-- If machine-used contract constants must change, update `scripts/food_brain_contract.py` deliberately and then keep the reference docs aligned.
+- If machine-used contract constants must change, update `scripts/contract.py` deliberately and then keep the reference docs aligned.
 - Stay conservative: this v1 engine only guarantees dinner + side query/planner support.
 
 ## Decide what to read first
@@ -28,7 +28,7 @@ Use this skill to keep the reusable Kitchen Compass engine separate from househo
 
 ## Use the bundled scripts
 
-Assume the shell is currently in the installed `food-brain` skill directory:
+Assume the shell is currently in the installed `kitchen-compass` skill directory:
 
 ```bash
 cd /path/to/kitchen-compass

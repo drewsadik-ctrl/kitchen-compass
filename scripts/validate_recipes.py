@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from food_brain_contract import (
+from contract import (
     ALLOWED_PAIR_WITH_PREFIXES,
     COMPOSITION_VALUES,
     COMPOSITION_VALUE_SET,
@@ -17,7 +17,7 @@ from food_brain_contract import (
     parse_snapshot_block,
     split_list,
 )
-from food_brain_paths import FoodBrainPaths, resolve_data_root
+from paths import FoodBrainPaths, resolve_data_root
 
 
 def validate_section_order(text: str) -> list[str]:

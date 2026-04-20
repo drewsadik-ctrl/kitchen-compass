@@ -8,13 +8,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from food_brain_contract import (
+from contract import (
     INVENTORY_KINDS,
     INVENTORY_LOCATIONS,
     INVENTORY_PRIORITIES,
     INVENTORY_SCHEMA_VERSION,
 )
-from food_brain_paths import FoodBrainPaths
+from paths import FoodBrainPaths
 
 NON_WORD_RE = re.compile(r"[^a-z0-9]+")
 TOKEN_RE = re.compile(r"[a-z0-9]+")

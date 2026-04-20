@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from food_brain_paths import FoodBrainPaths, resolve_data_root, skill_root
+from paths import FoodBrainPaths, resolve_data_root, skill_root
 
 SAMPLE_ROOT = skill_root() / "assets" / "sample-household"
 RECIPE_TEMPLATE = skill_root() / "assets" / "recipe-template.md"
