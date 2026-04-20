@@ -27,7 +27,7 @@ Kitchen Compass supports:
 - explicit add / set / confirmed-use flows
 - a boolean `planning.prioritize_inventory` toggle
 
-Note: it does track inventory *automatically*, but relies on the user telling it when an item has been consumed.
+Note: it does not track inventory *automatically*, but relies on the user telling it when an item has been consumed.
 
 ### 3. Weekly deal workflow
 Deals are **not** planner scoring input.
