@@ -13,7 +13,7 @@ from deals import (
     normalize_weekly_deal_input,
     render_combined_weekly_deal_sheet_markdown,
 )
-from paths import FoodBrainPaths, resolve_data_root
+from paths import FoodBrainPaths, resolve_data_root, write_atomic
 
 
 
@@ -50,8 +50,8 @@ def main() -> None:
         briefs.append(normalize_weekly_deal_input(raw, config))
 
     combined = combine_weekly_deal_briefs(briefs)
-    paths.generated_combined_deal_sheet_file.write_text(json.dumps(combined, indent=2) + "\n")
-    paths.generated_combined_deal_sheet_markdown_file.write_text(render_combined_weekly_deal_sheet_markdown(combined))
+    write_atomic(paths.generated_combined_deal_sheet_file, json.dumps(combined, indent=2) + "\n")
+    write_atomic(paths.generated_combined_deal_sheet_markdown_file, render_combined_weekly_deal_sheet_markdown(combined))
 
     if args.json:
         print(json.dumps(combined, indent=2))

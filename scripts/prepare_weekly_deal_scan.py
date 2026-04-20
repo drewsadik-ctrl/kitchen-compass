@@ -14,7 +14,7 @@ from deals import (
     normalize_brief_source,
     save_weekly_deal_input,
 )
-from paths import FoodBrainPaths, resolve_data_root
+from paths import FoodBrainPaths, resolve_data_root, write_atomic
 
 
 def build_store_brief_stub(week_of: str, store: dict) -> dict:
@@ -130,8 +130,8 @@ def main() -> None:
         stub_statuses[store_id] = write_stub(target, build_store_brief_stub(week_of, store), force=args.force)
 
     packet = build_scan_packet(paths, config, week_of, selected_store_ids, stub_statuses)
-    paths.generated_deal_scan_file.write_text(json.dumps(packet, indent=2) + "\n")
-    paths.generated_deal_scan_markdown_file.write_text(render_scan_packet_markdown(packet))
+    write_atomic(paths.generated_deal_scan_file, json.dumps(packet, indent=2) + "\n")
+    write_atomic(paths.generated_deal_scan_markdown_file, render_scan_packet_markdown(packet))
 
     if args.json:
         print(json.dumps(packet, indent=2))

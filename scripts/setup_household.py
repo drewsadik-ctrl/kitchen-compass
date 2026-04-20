@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from paths import FoodBrainPaths, resolve_data_root, skill_root
+from paths import FoodBrainPaths, resolve_data_root, skill_root, write_atomic
 
 SAMPLE_ROOT = skill_root() / "assets" / "sample-household"
 RECIPE_TEMPLATE = skill_root() / "assets" / "recipe-template.md"
@@ -12,18 +12,17 @@ INVENTORY_STUB = '{\n  "version": 1,\n  "updated_at": null,\n  "items": []\n}\n'
 
 
 def write_file(target: Path, content: str, force: bool) -> str:
-    target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists() and not force:
         return "skipped"
-    target.write_text(content)
+    write_atomic(target, content)
     return "wrote"
 
 
 def copy_sample_tree(target_root: Path, force: bool) -> list[str]:
-    actions: list[str] = []
     if not SAMPLE_ROOT.exists():
-        return actions
+        raise SystemExit(f"Missing skill sample tree: {SAMPLE_ROOT}")
 
+    actions: list[str] = []
     for source in sorted(SAMPLE_ROOT.rglob("*")):
         relative = source.relative_to(SAMPLE_ROOT)
         target = target_root / relative

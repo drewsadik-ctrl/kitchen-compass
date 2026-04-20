@@ -10,13 +10,12 @@ from deals import (
     normalize_weekly_deal_input,
     render_weekly_deal_brief_markdown,
 )
-from paths import FoodBrainPaths, resolve_data_root
+from paths import FoodBrainPaths, resolve_data_root, write_atomic
 
 
 
 def write_text(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content)
+    write_atomic(path, content)
 
 
 

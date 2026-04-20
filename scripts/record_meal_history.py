@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from contract import HISTORY_EVENT_TYPES
-from paths import FoodBrainPaths, resolve_data_root
+from paths import FoodBrainPaths, append_jsonl, resolve_data_root
 
 
 def load_catalog(path: Path) -> dict[str, Any]:
@@ -40,21 +40,14 @@ def read_events(path: Path) -> list[dict[str, Any]]:
     events: list[dict[str, Any]] = []
     for line in path.read_text().splitlines():
         line = line.strip()
-        if not line or line == "[]":
+        if not line:
             continue
         events.append(json.loads(line))
     return events
 
 
 def append_event(path: Path, event: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    existing = path.read_text() if path.exists() else ""
-    if existing.strip() == "[]":
-        existing = ""
-    with path.open("a", encoding="utf-8") as handle:
-        if existing and not existing.endswith("\n"):
-            handle.write("\n")
-        handle.write(json.dumps(event, sort_keys=True) + "\n")
+    append_jsonl(path, event)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -75,7 +68,16 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     args = build_parser().parse_args()
     paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root))
-    history_path = Path(args.history_file).expanduser().resolve() if args.history_file else paths.history_file
+    if args.history_file:
+        history_path = Path(args.history_file).expanduser().resolve()
+        try:
+            history_path.relative_to(paths.data_root)
+        except ValueError:
+            raise SystemExit(
+                f"--history-file must be inside --data-root ({paths.data_root}); got {history_path}"
+            )
+    else:
+        history_path = paths.history_file
 
     if args.show:
         events = read_events(history_path)

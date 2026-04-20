@@ -14,7 +14,7 @@ from contract import (
     INVENTORY_PRIORITIES,
     INVENTORY_SCHEMA_VERSION,
 )
-from paths import FoodBrainPaths
+from paths import FoodBrainPaths, append_jsonl, write_atomic
 
 NON_WORD_RE = re.compile(r"[^a-z0-9]+")
 TOKEN_RE = re.compile(r"[a-z0-9]+")
@@ -190,28 +190,26 @@ def load_inventory_state(paths: FoodBrainPaths) -> dict[str, Any]:
     path = paths.inventory_items_file
     if not path.exists():
         return ensure_inventory_state_shape()
-    return ensure_inventory_state_shape(json.loads(path.read_text()))
+    payload = json.loads(path.read_text())
+    version = payload.get("version")
+    if version is not None and version != INVENTORY_SCHEMA_VERSION:
+        raise SystemExit(
+            f"{path}: inventory schema version {version} is not supported "
+            f"(this engine reads version {INVENTORY_SCHEMA_VERSION})."
+        )
+    return ensure_inventory_state_shape(payload)
 
 
 
 def save_inventory_state(paths: FoodBrainPaths, state: dict[str, Any]) -> None:
     normalized = ensure_inventory_state_shape(state)
     normalized["updated_at"] = utc_now_iso()
-    paths.inventory_dir.mkdir(parents=True, exist_ok=True)
-    paths.inventory_items_file.write_text(json.dumps(normalized, indent=2) + "\n")
+    write_atomic(paths.inventory_items_file, json.dumps(normalized, indent=2) + "\n")
 
 
 
 def append_inventory_transaction(paths: FoodBrainPaths, event: dict[str, Any]) -> None:
-    path = paths.inventory_transactions_file
-    path.parent.mkdir(parents=True, exist_ok=True)
-    existing = path.read_text() if path.exists() else ""
-    if existing.strip() == "[]":
-        existing = ""
-    with path.open("a", encoding="utf-8") as handle:
-        if existing and not existing.endswith("\n"):
-            handle.write("\n")
-        handle.write(json.dumps(event, sort_keys=True) + "\n")
+    append_jsonl(paths.inventory_transactions_file, event)
 
 
 

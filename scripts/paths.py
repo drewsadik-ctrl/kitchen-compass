@@ -1,11 +1,45 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import fcntl
+import json
 import os
+import sys
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 DATA_ROOT_ENV = "FOOD_BRAIN_DATA_ROOT"
+
+
+def write_atomic(path: Path, content: str, encoding: str = "utf-8") -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_name = tempfile.mkstemp(
+        prefix=f".{path.name}.", suffix=".tmp", dir=str(path.parent)
+    )
+    tmp_path = Path(tmp_name)
+    try:
+        with os.fdopen(fd, "w", encoding=encoding) as handle:
+            handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp_path, path)
+    except BaseException:
+        tmp_path.unlink(missing_ok=True)
+        raise
+
+
+def append_jsonl(path: Path, event: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    line = json.dumps(event, sort_keys=True) + "\n"
+    with path.open("a", encoding="utf-8") as handle:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        try:
+            handle.write(line)
+            handle.flush()
+        finally:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
 
 
 @dataclass(frozen=True)
@@ -97,6 +131,12 @@ def looks_like_skill_root(path: Path) -> bool:
 
 
 def resolve_data_root(raw: str | None = None) -> Path:
+    resolved = _resolve_data_root(raw)
+    print(f"[kitchen-compass] data root: {resolved}", file=sys.stderr)
+    return resolved
+
+
+def _resolve_data_root(raw: str | None) -> Path:
     if raw:
         return Path(raw).expanduser().resolve()
 

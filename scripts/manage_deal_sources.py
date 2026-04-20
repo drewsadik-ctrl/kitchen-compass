@@ -115,9 +115,7 @@ def command_validate(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
     config = load_raw_stores_config(paths)
     errors = validate_stores_config(config)
     if errors:
-        for error in errors:
-            print(f"ERROR: {error}")
-        raise SystemExit(1)
+        raise SystemExit("\n".join(f"ERROR: {e}" for e in errors))
     if args.json:
         print(json.dumps(config, indent=2))
         return
@@ -130,9 +128,7 @@ def command_enable(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
     config["weekly_deal_brief"]["enabled"] = args.enabled
     errors = validate_stores_config(config)
     if errors:
-        for error in errors:
-            print(f"ERROR: {error}")
-        raise SystemExit(1)
+        raise SystemExit("\n".join(f"ERROR: {e}" for e in errors))
     save_stores_config(paths, config)
     print(json.dumps(config["weekly_deal_brief"], indent=2))
 
@@ -154,9 +150,7 @@ def command_set_scan_schedule(args: argparse.Namespace, paths: FoodBrainPaths) -
     config["weekly_deal_brief"] = weekly
     errors = validate_stores_config(config)
     if errors:
-        for error in errors:
-            print(f"ERROR: {error}")
-        raise SystemExit(1)
+        raise SystemExit("\n".join(f"ERROR: {e}" for e in errors))
     save_stores_config(paths, config)
     print(json.dumps(config["weekly_deal_brief"].get("scan_schedule", {}), indent=2))
 
@@ -177,9 +171,7 @@ def command_add_store(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
         updated["weekly_deal_brief"]["enabled"] = True
     errors = validate_stores_config(updated)
     if errors:
-        for error in errors:
-            print(f"ERROR: {error}")
-        raise SystemExit(1)
+        raise SystemExit("\n".join(f"ERROR: {e}" for e in errors))
     save_stores_config(paths, updated)
     print(json.dumps(store, indent=2))
 
@@ -214,9 +206,7 @@ def command_set_store(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
         updated = set_default_store(updated, updated_store["id"], args.default)
     errors = validate_stores_config(updated)
     if errors:
-        for error in errors:
-            print(f"ERROR: {error}")
-        raise SystemExit(1)
+        raise SystemExit("\n".join(f"ERROR: {e}" for e in errors))
     save_stores_config(paths, updated)
     print(json.dumps(updated_store, indent=2))
 

@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from inventory import load_inventory_state, recipe_inventory_support
-from paths import FoodBrainPaths, resolve_data_root
+from paths import FoodBrainPaths, resolve_data_root, write_atomic
 
 EFFORT_ORDER = {"easy": 0, "moderate": 1, "involved": 2}
 FRICTION_ORDER = {"low": 0, "medium": 1, "high": 2}
@@ -848,15 +848,15 @@ def write_outputs(
 ) -> None:
     paths.ensure_runtime_dirs()
     bundle = build_example_bundle(payload, dinners_per_week, history_path, ignore_history, inventory_state, prioritize_inventory)
-    (paths.generated_planner_dir / "weekly-plans.json").write_text(json.dumps(bundle, indent=2) + "\n")
+    write_atomic(paths.generated_planner_dir / "weekly-plans.json", json.dumps(bundle, indent=2) + "\n")
 
     overview_lines = ["# Kitchen Compass Weekly Planner v1 — Example Plans", ""]
     for name, plan in bundle.items():
         file_name = f"{name}.md"
-        (paths.planner_views_dir / file_name).write_text(render_plan_markdown(plan))
+        write_atomic(paths.planner_views_dir / file_name, render_plan_markdown(plan))
         overview_lines.append(f"- [{plan['preset_label']}](./{file_name})")
     overview_lines.append("")
-    (paths.planner_views_dir / "README.md").write_text("\n".join(overview_lines))
+    write_atomic(paths.planner_views_dir / "README.md", "\n".join(overview_lines))
 
 
 def build_parser() -> argparse.ArgumentParser:
