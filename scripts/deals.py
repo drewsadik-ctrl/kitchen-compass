@@ -16,7 +16,7 @@ from contract import (
     WEEKLY_DEAL_SOURCE_TYPES,
     WEEKLY_DEAL_STORE_STATUSES,
 )
-from paths import FoodBrainPaths
+from paths import FoodBrainPaths, write_atomic
 
 NON_WORD_RE = re.compile(r"[^a-z0-9]+")
 URL_RE = re.compile(r"^https?://", re.IGNORECASE)
@@ -262,8 +262,10 @@ def load_raw_stores_config(paths: FoodBrainPaths) -> dict[str, Any]:
 
 
 def save_stores_config(paths: FoodBrainPaths, state: dict[str, Any]) -> None:
-    paths.household_dir.mkdir(parents=True, exist_ok=True)
-    (paths.household_dir / "stores.json").write_text(json.dumps(ensure_stores_config_shape(state), indent=2) + "\n")
+    write_atomic(
+        paths.household_dir / "stores.json",
+        json.dumps(ensure_stores_config_shape(state), indent=2) + "\n",
+    )
 
 
 
@@ -275,8 +277,7 @@ def load_weekly_deal_input(path: Path) -> dict[str, Any]:
 
 
 def save_weekly_deal_input(path: Path, payload: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2) + "\n")
+    write_atomic(path, json.dumps(payload, indent=2) + "\n")
 
 
 

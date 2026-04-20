@@ -14,7 +14,7 @@ from contract import (
     INVENTORY_PRIORITIES,
     INVENTORY_SCHEMA_VERSION,
 )
-from paths import FoodBrainPaths
+from paths import FoodBrainPaths, write_atomic
 
 NON_WORD_RE = re.compile(r"[^a-z0-9]+")
 TOKEN_RE = re.compile(r"[a-z0-9]+")
@@ -197,8 +197,7 @@ def load_inventory_state(paths: FoodBrainPaths) -> dict[str, Any]:
 def save_inventory_state(paths: FoodBrainPaths, state: dict[str, Any]) -> None:
     normalized = ensure_inventory_state_shape(state)
     normalized["updated_at"] = utc_now_iso()
-    paths.inventory_dir.mkdir(parents=True, exist_ok=True)
-    paths.inventory_items_file.write_text(json.dumps(normalized, indent=2) + "\n")
+    write_atomic(paths.inventory_items_file, json.dumps(normalized, indent=2) + "\n")
 
 
 

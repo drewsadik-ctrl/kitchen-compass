@@ -20,7 +20,7 @@ from contract import (
     snapshot_fields_with_defaults,
     split_list,
 )
-from paths import FoodBrainPaths, resolve_data_root
+from paths import FoodBrainPaths, resolve_data_root, write_atomic
 
 PROTEIN_KEYWORDS = {
     "chicken", "sausage", "beef", "pork", "steak", "shrimp", "fish", "salmon", "cod",
@@ -417,8 +417,7 @@ def summarize_catalog(recipes: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def write_json(path: Path, payload: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n")
+    write_atomic(path, json.dumps(payload, indent=2, sort_keys=False) + "\n")
 
 
 def load_json_if_exists(path: Path) -> dict[str, Any]:
@@ -554,9 +553,9 @@ def main() -> None:
     paths.ensure_runtime_dirs()
     write_json(paths.generated_query_dir / "recipe-catalog.json", payload)
     write_json(paths.generated_query_dir / "common-queries.json", {key: value for key, value in common_views.items()})
-    (paths.query_planning_dir / "common-queries.md").write_text(render_common_queries(common_views))
-    (paths.query_planning_dir / "pairing-suggestions.md").write_text(render_pairings(recipes, pairing_intel))
-    (paths.query_planning_dir / "sides-by-main-protein.md").write_text(render_sides_by_protein(recipes))
+    write_atomic(paths.query_planning_dir / "common-queries.md", render_common_queries(common_views))
+    write_atomic(paths.query_planning_dir / "pairing-suggestions.md", render_pairings(recipes, pairing_intel))
+    write_atomic(paths.query_planning_dir / "sides-by-main-protein.md", render_sides_by_protein(recipes))
     print(f"Built query index for {len(recipes)} dinner/side recipes.")
     print(f"Wrote: {paths.generated_query_dir / 'recipe-catalog.json'}")
 

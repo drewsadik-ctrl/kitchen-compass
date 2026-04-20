@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from paths import FoodBrainPaths, resolve_data_root, skill_root
+from paths import FoodBrainPaths, resolve_data_root, skill_root, write_atomic
 
 SAMPLE_ROOT = skill_root() / "assets" / "sample-household"
 RECIPE_TEMPLATE = skill_root() / "assets" / "recipe-template.md"
@@ -12,10 +12,9 @@ INVENTORY_STUB = '{\n  "version": 1,\n  "updated_at": null,\n  "items": []\n}\n'
 
 
 def write_file(target: Path, content: str, force: bool) -> str:
-    target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists() and not force:
         return "skipped"
-    target.write_text(content)
+    write_atomic(target, content)
     return "wrote"
 
 
