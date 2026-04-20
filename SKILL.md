@@ -42,7 +42,7 @@ Then run scripts from `scripts/` against a household data root.
 python3 scripts/setup_household.py --data-root /path/to/kitchen-compass-data
 ```
 
-This creates the canonical user-data layout and copies the sample household stub plus `_recipe-template.md`.
+This creates the canonical user-data layout and copies the sample household stub, the sample `burger-bowls.md` recipe, and `_recipe-template.md`.
 
 ### Build the query catalog
 
@@ -111,4 +111,4 @@ python3 scripts/record_meal_history.py --data-root /path/to/kitchen-compass-data
 ## Assets
 
 - `assets/recipe-template.md` is the reusable authored template.
-- `assets/sample-household/` is seed content only. Replace placeholder values with real household data.
+- `assets/sample-household/` is seed content only. It now includes a sample `burger-bowls.md` dinner recipe; replace or expand it with real household data as needed.

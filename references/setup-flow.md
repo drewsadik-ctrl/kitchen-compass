@@ -12,7 +12,7 @@ cd /path/to/kitchen-compass
 
 ## Canonical setup sequence
 
-1. Run `python3 scripts/setup_household.py --data-root <path>`.
+1. Run `python3 scripts/setup_household.py --data-root <path>` to copy the sample household seed, including the sample `burger-bowls.md` recipe.
 2. Fill in `household/profile.json`, `household/preferences.json`, and `household/stores.json`.
 3. Add recipe markdown files under `recipes/` using `_recipe-template.md` or `assets/recipe-template.md`.
 4. Validate recipes with `python3 scripts/validate_recipes.py --data-root <path>`.
