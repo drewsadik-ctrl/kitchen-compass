@@ -19,10 +19,10 @@ def write_file(target: Path, content: str, force: bool) -> str:
 
 
 def copy_sample_tree(target_root: Path, force: bool) -> list[str]:
-    actions: list[str] = []
     if not SAMPLE_ROOT.exists():
-        return actions
+        raise SystemExit(f"Missing skill sample tree: {SAMPLE_ROOT}")
 
+    actions: list[str] = []
     for source in sorted(SAMPLE_ROOT.rglob("*")):
         relative = source.relative_to(SAMPLE_ROOT)
         target = target_root / relative
