@@ -4,6 +4,7 @@ from __future__ import annotations
 import fcntl
 import json
 import os
+import sys
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -130,6 +131,12 @@ def looks_like_skill_root(path: Path) -> bool:
 
 
 def resolve_data_root(raw: str | None = None) -> Path:
+    resolved = _resolve_data_root(raw)
+    print(f"[kitchen-compass] data root: {resolved}", file=sys.stderr)
+    return resolved
+
+
+def _resolve_data_root(raw: str | None) -> Path:
     if raw:
         return Path(raw).expanduser().resolve()
 
