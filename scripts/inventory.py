@@ -14,7 +14,7 @@ from contract import (
     INVENTORY_PRIORITIES,
     INVENTORY_SCHEMA_VERSION,
 )
-from paths import FoodBrainPaths, write_atomic
+from paths import FoodBrainPaths, append_jsonl, write_atomic
 
 NON_WORD_RE = re.compile(r"[^a-z0-9]+")
 TOKEN_RE = re.compile(r"[a-z0-9]+")
@@ -202,15 +202,7 @@ def save_inventory_state(paths: FoodBrainPaths, state: dict[str, Any]) -> None:
 
 
 def append_inventory_transaction(paths: FoodBrainPaths, event: dict[str, Any]) -> None:
-    path = paths.inventory_transactions_file
-    path.parent.mkdir(parents=True, exist_ok=True)
-    existing = path.read_text() if path.exists() else ""
-    if existing.strip() == "[]":
-        existing = ""
-    with path.open("a", encoding="utf-8") as handle:
-        if existing and not existing.endswith("\n"):
-            handle.write("\n")
-        handle.write(json.dumps(event, sort_keys=True) + "\n")
+    append_jsonl(paths.inventory_transactions_file, event)
 
 
 

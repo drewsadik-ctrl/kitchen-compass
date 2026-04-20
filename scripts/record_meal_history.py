@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from contract import HISTORY_EVENT_TYPES
-from paths import FoodBrainPaths, resolve_data_root
+from paths import FoodBrainPaths, append_jsonl, resolve_data_root
 
 
 def load_catalog(path: Path) -> dict[str, Any]:
@@ -40,21 +40,14 @@ def read_events(path: Path) -> list[dict[str, Any]]:
     events: list[dict[str, Any]] = []
     for line in path.read_text().splitlines():
         line = line.strip()
-        if not line or line == "[]":
+        if not line:
             continue
         events.append(json.loads(line))
     return events
 
 
 def append_event(path: Path, event: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    existing = path.read_text() if path.exists() else ""
-    if existing.strip() == "[]":
-        existing = ""
-    with path.open("a", encoding="utf-8") as handle:
-        if existing and not existing.endswith("\n"):
-            handle.write("\n")
-        handle.write(json.dumps(event, sort_keys=True) + "\n")
+    append_jsonl(path, event)
 
 
 def build_parser() -> argparse.ArgumentParser:

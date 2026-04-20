@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import fcntl
+import json
 import os
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 DATA_ROOT_ENV = "FOOD_BRAIN_DATA_ROOT"
 
@@ -24,6 +27,18 @@ def write_atomic(path: Path, content: str, encoding: str = "utf-8") -> None:
     except BaseException:
         tmp_path.unlink(missing_ok=True)
         raise
+
+
+def append_jsonl(path: Path, event: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    line = json.dumps(event, sort_keys=True) + "\n"
+    with path.open("a", encoding="utf-8") as handle:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        try:
+            handle.write(line)
+            handle.flush()
+        finally:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
 
 
 @dataclass(frozen=True)
