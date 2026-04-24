@@ -1,6 +1,6 @@
 # Kitchen Compass
 
-A deterministic, explainable weekly dinner planner. Not a random weekly recipe picker — a weighted candidate ranker with hard constraints, history-aware drift control, and composition-aware explanations. Optionally, it remembers freezer/pantry inventory and helps you triage weekly grocery circulars.
+A deterministic, explainable weekly dinner planner based on **your personal recipes and preferences**. Not a random weekly recipe picker — a weighted candidate ranker with hard constraints, history-aware drift control, and composition-aware explanations. Optionally, it remembers freezer/pantry inventory and helps you triage weekly grocery circulars.
 
 The thesis: one great dinner is not enough if it makes the whole week annoying. Kitchen Compass optimizes for a good **week**, not a good single pick.
 
