@@ -21,6 +21,7 @@ from contract import (
     split_list,
 )
 from paths import FoodBrainPaths, resolve_data_root, write_atomic
+from validation import validate_recipe_paths
 
 PROTEIN_KEYWORDS = {
     "chicken", "sausage", "beef", "pork", "steak", "shrimp", "fish", "salmon", "cod",
@@ -526,6 +527,7 @@ def render_pairings(recipes: list[dict[str, Any]], pairing_intel: dict[str, dict
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the portable Kitchen Compass dinner + side query catalog.")
     parser.add_argument("--data-root", help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.")
+    parser.add_argument("--skip-validation", action="store_true", help="Skip the pre-build validation pass. Power-user escape hatch; normal usage should leave this off.")
     return parser.parse_args()
 
 
@@ -535,7 +537,21 @@ def main() -> None:
     if not paths.recipes_dir.exists():
         raise SystemExit(f"Missing recipes directory: {paths.recipes_dir}")
 
-    recipes = [load_recipe(path, paths) for path in sorted(paths.recipes_dir.glob("*.md")) if not path.name.startswith("_")]
+    recipe_paths = sorted(path for path in paths.recipes_dir.glob("*.md") if not path.name.startswith("_"))
+    if not args.skip_validation:
+        failures = validate_recipe_paths(recipe_paths)
+        if failures:
+            for recipe_path, errors in failures:
+                print(f"- {recipe_path.relative_to(paths.data_root)}")
+                for error in errors:
+                    print(f"  - {error}")
+            raise SystemExit(
+                f"[ERROR] {len(failures)} recipe file(s) failed validation. "
+                f"Run `python3 scripts/validate_recipes.py --data-root {paths.data_root}` "
+                "and fix errors before rebuilding (or pass --skip-validation)."
+            )
+
+    recipes = [load_recipe(path, paths) for path in recipe_paths]
     recipes = [recipe for recipe in recipes if meal_scope(recipe)]
     pairing_intel = build_pairing_intelligence(recipes)
     common_views = common_query_views(recipes)
