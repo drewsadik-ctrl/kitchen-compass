@@ -8,7 +8,7 @@ Kitchen Compass does the picking for you. Give it your recipes, tell it what kin
 
 It learns from what you cook. It remembers what's in your freezer if you tell it. And if you shop the same grocery store each week, it can help you triage the circular without opening the flyer yourself.
 
-The goal isn't the fanciest week. It's the week that actually works.
+Home cooking is the best, but a great meal doesn't feel satisfying when getting there required Operation Desert Storm level logistics and planning.
 
 ## Quickstart
 
