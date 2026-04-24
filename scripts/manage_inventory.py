@@ -20,7 +20,7 @@ from inventory import (
     slugify,
     subtract_quantity,
 )
-from paths import FoodBrainPaths, resolve_data_root
+from paths import KitchenCompassPaths, resolve_data_root
 
 
 
@@ -83,7 +83,7 @@ def build_item_from_args(args: argparse.Namespace) -> dict[str, object]:
 
 
 
-def command_show(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_show(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     state = load_inventory_state(paths)
     items = state.get("items", [])
     if args.available_only:
@@ -99,7 +99,7 @@ def command_show(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
 
 
 
-def command_add(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_add(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     state = load_inventory_state(paths)
     item = build_item_from_args(args)
     ensure_unique_item_id(state, item["id"])
@@ -110,7 +110,7 @@ def command_add(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
 
 
 
-def command_set(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_set(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     state = load_inventory_state(paths)
     item = inventory_item_by_id(state, args.item)
     if not item:
@@ -146,7 +146,7 @@ def command_set(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
 
 
 
-def command_use(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_use(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     if not args.confirmed:
         raise SystemExit("Refusing to subtract inventory without --confirmed. Inventory changes must be explicit and user-confirmed.")
 
@@ -219,7 +219,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
 
     try:
         if args.command == "show":

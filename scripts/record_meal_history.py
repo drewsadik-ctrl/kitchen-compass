@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from contract import HISTORY_EVENT_TYPES
-from paths import FoodBrainPaths, append_jsonl, resolve_data_root
+from paths import KitchenCompassPaths, append_jsonl, resolve_data_root
 
 
 def load_catalog(path: Path) -> dict[str, Any]:
@@ -68,7 +68,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     if args.history_file:
         history_path = Path(args.history_file).expanduser().resolve()
         try:

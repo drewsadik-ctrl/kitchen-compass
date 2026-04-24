@@ -20,7 +20,7 @@ from contract import (
     snapshot_fields_with_defaults,
     split_list,
 )
-from paths import FoodBrainPaths, resolve_data_root, write_atomic
+from paths import KitchenCompassPaths, resolve_data_root, write_atomic
 from validation import validate_recipe_paths
 
 PROTEIN_KEYWORDS = {
@@ -214,7 +214,7 @@ def build_pairing_blob(recipe: dict[str, Any]) -> str:
     return " ".join(values).lower()
 
 
-def load_recipe(path: Path, paths: FoodBrainPaths) -> dict[str, Any]:
+def load_recipe(path: Path, paths: KitchenCompassPaths) -> dict[str, Any]:
     text = path.read_text()
     title = text.splitlines()[0].lstrip("# ").strip()
     snapshot = parse_snapshot(text)
@@ -427,7 +427,7 @@ def load_json_if_exists(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text())
 
 
-def load_household_config(paths: FoodBrainPaths) -> dict[str, Any]:
+def load_household_config(paths: KitchenCompassPaths) -> dict[str, Any]:
     return {
         "profile": load_json_if_exists(paths.household_dir / "profile.json"),
         "preferences": load_json_if_exists(paths.household_dir / "preferences.json"),
@@ -534,7 +534,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     if not paths.recipes_dir.exists():
         raise SystemExit(f"Missing recipes directory: {paths.recipes_dir}")
 

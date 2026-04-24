@@ -13,7 +13,7 @@ from deals import (
     normalize_weekly_deal_input,
     render_combined_weekly_deal_sheet_markdown,
 )
-from paths import FoodBrainPaths, resolve_data_root, write_atomic
+from paths import KitchenCompassPaths, resolve_data_root, write_atomic
 
 
 
@@ -29,7 +29,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     config = load_stores_config(paths)
     selected_store_ids = args.store or default_weekly_deal_store_ids(config)
     if not selected_store_ids:

@@ -34,7 +34,9 @@ cd /path/to/kitchen-compass
 
 ## Current runtime expectations
 
-- Pass the household root with `--data-root`, or set `FOOD_BRAIN_DATA_ROOT`.
+- Pass the household root with `--data-root`, or set `KITCHEN_COMPASS_DATA_ROOT`.
+
+**Migration:** `FOOD_BRAIN_DATA_ROOT` is still honored but deprecated; set `KITCHEN_COMPASS_DATA_ROOT` instead.
 - `household/preferences.json` currently drives `planning.default_preset`, `planning.default_dinners_per_week`, and `planning.prioritize_inventory` in the planner.
 - `household/stores.json` can also store optional weekly deal brief setup, but deal briefs stay outside planner scoring.
 - Treat other household JSON fields as stored context unless a script explicitly documents that it reads them.

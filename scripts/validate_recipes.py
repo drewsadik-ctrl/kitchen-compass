@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import argparse
 
-from paths import FoodBrainPaths, resolve_data_root
+from paths import KitchenCompassPaths, resolve_data_root
 from validation import validate_recipe_paths
 
 
@@ -21,7 +21,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     recipe_paths = sorted(path for path in paths.recipes_dir.glob("*.md") if not path.name.startswith("_"))
 
     if not recipe_paths:

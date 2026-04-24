@@ -10,10 +10,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-DATA_ROOT_ENV = "FOOD_BRAIN_DATA_ROOT"
+DATA_ROOT_ENV = "KITCHEN_COMPASS_DATA_ROOT"
+LEGACY_DATA_ROOT_ENV = "FOOD_BRAIN_DATA_ROOT"
 VERBOSE_ENV = "KITCHEN_COMPASS_VERBOSE"
 
 _LOGGED_ROOTS: set[Path] = set()
+_LEGACY_ENV_WARNED = False
 
 
 def write_atomic(path: Path, content: str, encoding: str = "utf-8") -> None:
@@ -46,7 +48,7 @@ def append_jsonl(path: Path, event: dict[str, Any]) -> None:
 
 
 @dataclass(frozen=True)
-class FoodBrainPaths:
+class KitchenCompassPaths:
     data_root: Path
     household_dir: Path
     recipes_dir: Path
@@ -73,7 +75,7 @@ class FoodBrainPaths:
     raw_recipes_dir: Path
 
     @classmethod
-    def from_root(cls, data_root: Path) -> "FoodBrainPaths":
+    def from_root(cls, data_root: Path) -> "KitchenCompassPaths":
         root = data_root.expanduser().resolve()
         generated_dir = root / "generated"
         return cls(
@@ -121,6 +123,11 @@ class FoodBrainPaths:
             path.mkdir(parents=True, exist_ok=True)
 
 
+# DEPRECATED: retained for backwards compatibility with code that imported
+# the old name. New code should use KitchenCompassPaths.
+FoodBrainPaths = KitchenCompassPaths
+
+
 def skill_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
@@ -145,9 +152,15 @@ def _resolve_data_root(raw: str | None) -> Path:
     if raw:
         return Path(raw).expanduser().resolve()
 
-    env_value = os.environ.get(DATA_ROOT_ENV)
-    if env_value:
-        return Path(env_value).expanduser().resolve()
+    new_env = os.environ.get(DATA_ROOT_ENV)
+    legacy_env = os.environ.get(LEGACY_DATA_ROOT_ENV)
+    if legacy_env and not new_env:
+        _warn_legacy_env_once()
+        return Path(legacy_env).expanduser().resolve()
+    if new_env and legacy_env:
+        _warn_legacy_env_once()
+    if new_env:
+        return Path(new_env).expanduser().resolve()
 
     cwd = Path.cwd().resolve()
     if looks_like_data_root(cwd):
@@ -164,3 +177,14 @@ def _resolve_data_root(raw: str | None) -> Path:
         return sibling_root
 
     return default_child
+
+
+def _warn_legacy_env_once() -> None:
+    global _LEGACY_ENV_WARNED
+    if _LEGACY_ENV_WARNED:
+        return
+    _LEGACY_ENV_WARNED = True
+    print(
+        f"[kitchen-compass] {LEGACY_DATA_ROOT_ENV} is deprecated; use {DATA_ROOT_ENV} instead.",
+        file=sys.stderr,
+    )

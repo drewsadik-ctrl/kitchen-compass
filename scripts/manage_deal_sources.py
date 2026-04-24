@@ -18,7 +18,7 @@ from deals import (
     slugify,
     validate_stores_config,
 )
-from paths import FoodBrainPaths, resolve_data_root
+from paths import KitchenCompassPaths, resolve_data_root
 
 
 SOURCE_HELP = "One of: " + ", ".join(WEEKLY_DEAL_SOURCE_TYPES)
@@ -91,7 +91,7 @@ def set_default_store(config: dict, store_id: str, enabled: bool) -> dict:
 
 
 
-def command_show(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_show(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     config = load_stores_config(paths)
     if args.json:
         print(json.dumps(config, indent=2))
@@ -111,7 +111,7 @@ def command_show(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
 
 
 
-def command_validate(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_validate(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     config = load_raw_stores_config(paths)
     errors = validate_stores_config(config)
     if errors:
@@ -123,7 +123,7 @@ def command_validate(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
 
 
 
-def command_enable(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_enable(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     config = load_stores_config(paths)
     config["weekly_deal_brief"]["enabled"] = args.enabled
     errors = validate_stores_config(config)
@@ -134,7 +134,7 @@ def command_enable(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
 
 
 
-def command_set_scan_schedule(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_set_scan_schedule(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     config = load_stores_config(paths)
     weekly = deepcopy(config.get("weekly_deal_brief") or {})
     if args.clear:
@@ -156,7 +156,7 @@ def command_set_scan_schedule(args: argparse.Namespace, paths: FoodBrainPaths) -
 
 
 
-def command_add_store(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_add_store(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     if not args.label:
         raise SystemExit("--label is required")
     if not args.retailer:
@@ -177,7 +177,7 @@ def command_add_store(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
 
 
 
-def command_set_store(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_set_store(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     config = load_stores_config(paths)
     existing = deal_store_by_id(config, args.store)
     if not existing:
@@ -284,7 +284,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
 
     if args.command == "show":
         command_show(args, paths)

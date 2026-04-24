@@ -14,7 +14,7 @@ from deals import (
     normalize_brief_source,
     save_weekly_deal_input,
 )
-from paths import FoodBrainPaths, resolve_data_root, write_atomic
+from paths import KitchenCompassPaths, resolve_data_root, write_atomic
 
 
 def build_store_brief_stub(week_of: str, store: dict) -> dict:
@@ -39,7 +39,7 @@ def write_stub(path: Path, payload: dict, force: bool) -> str:
 
 
 
-def build_scan_packet(paths: FoodBrainPaths, config: dict, week_of: str, store_ids: list[str], stub_statuses: dict[str, str]) -> dict:
+def build_scan_packet(paths: KitchenCompassPaths, config: dict, week_of: str, store_ids: list[str], stub_statuses: dict[str, str]) -> dict:
     weekly = config.get("weekly_deal_brief", {})
     stores = []
     for store_id in store_ids:
@@ -114,7 +114,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     paths.ensure_runtime_dirs()
     config = load_stores_config(paths)
     selected_store_ids = args.store or default_weekly_deal_store_ids(config)

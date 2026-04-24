@@ -14,7 +14,7 @@ from contract import (
     INVENTORY_PRIORITIES,
     INVENTORY_SCHEMA_VERSION,
 )
-from paths import FoodBrainPaths, append_jsonl, write_atomic
+from paths import KitchenCompassPaths, append_jsonl, write_atomic
 
 NON_WORD_RE = re.compile(r"[^a-z0-9]+")
 TOKEN_RE = re.compile(r"[a-z0-9]+")
@@ -186,7 +186,7 @@ def ensure_inventory_state_shape(state: dict[str, Any] | None = None) -> dict[st
 
 
 
-def load_inventory_state(paths: FoodBrainPaths) -> dict[str, Any]:
+def load_inventory_state(paths: KitchenCompassPaths) -> dict[str, Any]:
     path = paths.inventory_items_file
     if not path.exists():
         return ensure_inventory_state_shape()
@@ -201,14 +201,14 @@ def load_inventory_state(paths: FoodBrainPaths) -> dict[str, Any]:
 
 
 
-def save_inventory_state(paths: FoodBrainPaths, state: dict[str, Any]) -> None:
+def save_inventory_state(paths: KitchenCompassPaths, state: dict[str, Any]) -> None:
     normalized = ensure_inventory_state_shape(state)
     normalized["updated_at"] = utc_now_iso()
     write_atomic(paths.inventory_items_file, json.dumps(normalized, indent=2) + "\n")
 
 
 
-def append_inventory_transaction(paths: FoodBrainPaths, event: dict[str, Any]) -> None:
+def append_inventory_transaction(paths: KitchenCompassPaths, event: dict[str, Any]) -> None:
     append_jsonl(paths.inventory_transactions_file, event)
 
 

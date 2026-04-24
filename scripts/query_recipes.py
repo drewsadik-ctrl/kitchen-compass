@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from contract import ACTIVE_ENGINE_MEAL_TYPES, ENUM_CHOICES
-from paths import FoodBrainPaths, resolve_data_root
+from paths import KitchenCompassPaths, resolve_data_root
 
 
 def load_catalog(path: Path) -> dict[str, Any]:
@@ -188,7 +188,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     payload = load_catalog(paths.generated_query_dir / "recipe-catalog.json")
 
     if args.pairs_with:

@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from inventory import load_inventory_state, recipe_inventory_support
-from paths import FoodBrainPaths, resolve_data_root, write_atomic
+from paths import KitchenCompassPaths, resolve_data_root, write_atomic
 
 EFFORT_ORDER = {"easy": 0, "moderate": 1, "involved": 2}
 FRICTION_ORDER = {"low": 0, "medium": 1, "high": 2}
@@ -278,11 +278,11 @@ def load_json_if_exists(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text())
 
 
-def load_household_preferences(paths: FoodBrainPaths) -> dict[str, Any]:
+def load_household_preferences(paths: KitchenCompassPaths) -> dict[str, Any]:
     return load_json_if_exists(paths.household_dir / "preferences.json")
 
 
-def planner_defaults(paths: FoodBrainPaths) -> tuple[str, int, bool]:
+def planner_defaults(paths: KitchenCompassPaths) -> tuple[str, int, bool]:
     planning = load_household_preferences(paths).get("planning", {})
     preset = planning.get("default_preset", "balanced")
     dinners_per_week = planning.get("default_dinners_per_week", 3)
@@ -838,7 +838,7 @@ def build_example_bundle(
 
 
 def write_outputs(
-    paths: FoodBrainPaths,
+    paths: KitchenCompassPaths,
     payload: dict[str, Any],
     dinners_per_week: int,
     history_path: Path | None,
@@ -867,7 +867,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     pre_parser.add_argument("--verbose", action="store_true", help="Print the resolved data root to stderr.")
     pre_args, _ = pre_parser.parse_known_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(pre_args.data_root, verbose=pre_args.verbose))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(pre_args.data_root, verbose=pre_args.verbose))
     default_preset, default_dinners_per_week, default_prioritize_inventory = planner_defaults(paths)
 
     parser = argparse.ArgumentParser(description="Build lean weekly dinner plans from the portable Kitchen Compass query catalog.", parents=[pre_parser])
@@ -887,7 +887,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     payload = load_catalog(paths.generated_query_dir / "recipe-catalog.json")
     history_path = Path(args.history_file).expanduser().resolve() if args.history_file else paths.history_file
     inventory_state = load_inventory_state(paths)

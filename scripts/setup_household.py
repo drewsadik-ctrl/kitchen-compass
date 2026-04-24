@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from paths import FoodBrainPaths, resolve_data_root, skill_root, write_atomic
+from paths import KitchenCompassPaths, resolve_data_root, skill_root, write_atomic
 
 SAMPLE_ROOT = skill_root() / "assets" / "sample-household"
 RECIPE_TEMPLATE = skill_root() / "assets" / "recipe-template.md"
@@ -35,7 +35,7 @@ def copy_sample_tree(target_root: Path, force: bool) -> list[str]:
 
 
 def bootstrap(data_root: Path, force: bool) -> list[str]:
-    paths = FoodBrainPaths.from_root(data_root)
+    paths = KitchenCompassPaths.from_root(data_root)
     paths.ensure_runtime_dirs()
 
     actions = copy_sample_tree(paths.data_root, force)
