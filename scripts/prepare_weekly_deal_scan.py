@@ -103,6 +103,7 @@ def render_scan_packet_markdown(packet: dict) -> str:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Prepare a weekly deal scan packet and per-store brief stubs for all selected stores.")
     parser.add_argument("--data-root", help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.")
+    parser.add_argument("--verbose", action="store_true", help="Print the resolved data root to stderr.")
     parser.add_argument("--week-of", help="Override the current week label, for example 2026-04-21.")
     parser.add_argument("--store", action="append", default=None, help="Optional store id filter. Repeat for multiple stores.")
     parser.add_argument("--force", action="store_true", help="Overwrite any existing per-store brief stubs.")
@@ -113,7 +114,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root))
+    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     paths.ensure_runtime_dirs()
     config = load_stores_config(paths)
     selected_store_ids = args.store or default_weekly_deal_store_ids(config)

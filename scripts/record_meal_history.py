@@ -53,6 +53,7 @@ def append_event(path: Path, event: dict[str, Any]) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Record simple Kitchen Compass meal history events.")
     parser.add_argument("--data-root", help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.")
+    parser.add_argument("--verbose", action="store_true", help="Print the resolved data root to stderr.")
     parser.add_argument("--history-file", help="Override the history JSONL path.")
     parser.add_argument("--event-type", choices=list(HISTORY_EVENT_TYPES))
     parser.add_argument("--recipe", help="Recipe slug or exact title from the Kitchen Compass catalog.")
@@ -67,7 +68,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root))
+    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     if args.history_file:
         history_path = Path(args.history_file).expanduser().resolve()
         try:

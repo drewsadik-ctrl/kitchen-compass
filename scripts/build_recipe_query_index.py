@@ -528,12 +528,13 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the portable Kitchen Compass dinner + side query catalog.")
     parser.add_argument("--data-root", help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.")
     parser.add_argument("--skip-validation", action="store_true", help="Skip the pre-build validation pass. Power-user escape hatch; normal usage should leave this off.")
+    parser.add_argument("--verbose", action="store_true", help="Print the resolved data root to stderr.")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root))
+    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     if not paths.recipes_dir.exists():
         raise SystemExit(f"Missing recipes directory: {paths.recipes_dir}")
 

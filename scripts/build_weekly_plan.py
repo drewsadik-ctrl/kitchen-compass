@@ -865,8 +865,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--data-root",
         help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.",
     )
+    pre_parser.add_argument("--verbose", action="store_true", help="Print the resolved data root to stderr.")
     pre_args, _ = pre_parser.parse_known_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(pre_args.data_root))
+    paths = FoodBrainPaths.from_root(resolve_data_root(pre_args.data_root, verbose=pre_args.verbose))
     default_preset, default_dinners_per_week, default_prioritize_inventory = planner_defaults(paths)
 
     parser = argparse.ArgumentParser(description="Build lean weekly dinner plans from the portable Kitchen Compass query catalog.", parents=[pre_parser])
@@ -886,7 +887,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root))
+    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     payload = load_catalog(paths.generated_query_dir / "recipe-catalog.json")
     history_path = Path(args.history_file).expanduser().resolve() if args.history_file else paths.history_file
     inventory_state = load_inventory_state(paths)

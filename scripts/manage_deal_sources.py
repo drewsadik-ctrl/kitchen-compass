@@ -247,6 +247,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--data-root",
         help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.",
     )
+    parser.add_argument("--verbose", action="store_true", help="Print the resolved data root to stderr.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     show_parser = subparsers.add_parser("show", help="Show saved weekly deal brief store/source setup.")
@@ -283,7 +284,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root))
+    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
 
     if args.command == "show":
         command_show(args, paths)

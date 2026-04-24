@@ -20,6 +20,7 @@ from paths import FoodBrainPaths, resolve_data_root, write_atomic
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Render the combined weekly deal sheet from saved per-store weekly brief inputs.")
     parser.add_argument("--data-root", help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.")
+    parser.add_argument("--verbose", action="store_true", help="Print the resolved data root to stderr.")
     parser.add_argument("--store", action="append", default=None, help="Optional store id filter. Repeat for multiple stores.")
     parser.add_argument("--json", action="store_true", help="Print combined JSON instead of markdown.")
     return parser.parse_args()
@@ -28,7 +29,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root))
+    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     config = load_stores_config(paths)
     selected_store_ids = args.store or default_weekly_deal_store_ids(config)
     if not selected_store_ids:

@@ -11,6 +11,9 @@ from pathlib import Path
 from typing import Any
 
 DATA_ROOT_ENV = "FOOD_BRAIN_DATA_ROOT"
+VERBOSE_ENV = "KITCHEN_COMPASS_VERBOSE"
+
+_LOGGED_ROOTS: set[Path] = set()
 
 
 def write_atomic(path: Path, content: str, encoding: str = "utf-8") -> None:
@@ -130,9 +133,11 @@ def looks_like_skill_root(path: Path) -> bool:
     return (path / "SKILL.md").is_file() and (path / "scripts").is_dir() and (path / "assets").is_dir()
 
 
-def resolve_data_root(raw: str | None = None) -> Path:
+def resolve_data_root(raw: str | None = None, *, verbose: bool = False) -> Path:
     resolved = _resolve_data_root(raw)
-    print(f"[kitchen-compass] data root: {resolved}", file=sys.stderr)
+    if (verbose or os.environ.get(VERBOSE_ENV)) and resolved not in _LOGGED_ROOTS:
+        _LOGGED_ROOTS.add(resolved)
+        print(f"[kitchen-compass] data root: {resolved}", file=sys.stderr)
     return resolved
 
 
