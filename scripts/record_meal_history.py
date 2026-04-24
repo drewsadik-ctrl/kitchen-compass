@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from contract import HISTORY_EVENT_TYPES
-from paths import KitchenCompassPaths, append_jsonl, resolve_data_root
+from paths import KitchenCompassPaths, append_jsonl, resolve_data_root, write_atomic
 
 
 def load_catalog(path: Path) -> dict[str, Any]:
@@ -50,6 +50,28 @@ def append_event(path: Path, event: dict[str, Any]) -> None:
     append_jsonl(path, event)
 
 
+def event_key(event: dict[str, Any]) -> tuple[str, str, str, str]:
+    return (
+        event.get("date", ""),
+        event.get("recipe_slug", ""),
+        event.get("meal_slot", ""),
+        event.get("event_type", ""),
+    )
+
+
+def find_duplicate_index(events: list[dict[str, Any]], event: dict[str, Any]) -> int | None:
+    key = event_key(event)
+    for idx, existing in enumerate(events):
+        if event_key(existing) == key:
+            return idx
+    return None
+
+
+def rewrite_events(path: Path, events: list[dict[str, Any]]) -> None:
+    body = "".join(json.dumps(e, sort_keys=True) + "\n" for e in events)
+    write_atomic(path, body)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Record simple Kitchen Compass meal history events.")
     parser.add_argument("--data-root", help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.")
@@ -63,6 +85,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--notes", default="")
     parser.add_argument("--show", action="store_true", help="Show recent events instead of appending a new one.")
     parser.add_argument("--limit", type=int, default=20)
+    duplicate_group = parser.add_mutually_exclusive_group()
+    duplicate_group.add_argument("--allow-duplicate", action="store_true", help="Append even if an event with the same (date, recipe, meal_slot, event_type) already exists.")
+    duplicate_group.add_argument("--replace", action="store_true", help="If a duplicate exists, rewrite the file so the new event replaces it.")
     return parser
 
 
@@ -101,7 +126,22 @@ def main() -> None:
     if args.notes:
         event["notes"] = args.notes
 
-    append_event(history_path, event)
+    events = read_events(history_path)
+    duplicate_idx = find_duplicate_index(events, event)
+    if duplicate_idx is not None and not args.allow_duplicate and not args.replace:
+        print(
+            f"[kitchen-compass] duplicate history event ({event['date']}, {event['recipe_slug']}, "
+            f"{event['meal_slot']}, {event['event_type']}); skipping. Pass --allow-duplicate or --replace to override.",
+            file=__import__('sys').stderr,
+        )
+        return
+
+    if duplicate_idx is not None and args.replace:
+        events[duplicate_idx] = event
+        rewrite_events(history_path, events)
+    else:
+        append_event(history_path, event)
+
     print(json.dumps(event, indent=2, sort_keys=True))
 
 
