@@ -2,7 +2,7 @@
 
 A OpenClaw / Claude skill for planning the week's dinners — conversationally.
 
-You have 20-ish dinners you actually cook. The problem isn't that you need more recipes. It's that every Sunday you have to pick which four or five to do this week, and somehow you end up with chicken three nights in a row, two dishes that each demand their own side, and a recipe you also made last Tuesday.
+You have 20-ish dinners you actually cook. The problem isn't that you need more recipes. It's that every Sunday you have to pick which four or five to do this week, and somehow you end up with chicken three nights in a row and ordering Chipotle on Thursday.
 
 Home cooking is less satisfying when it takes Operation Desert Storm level planning and logistics to pull off. 
 
