@@ -12,11 +12,11 @@ cd /path/to/kitchen-compass
 
 ## Canonical setup sequence
 
-1. Run `python3 scripts/setup_household.py --data-root <path>` to copy the sample household seed, including the sample `burger-bowls.md` recipe.
+1. Run `python3 scripts/setup_household.py --data-root <path>` to copy the sample household seed, including a set of sample recipes under `assets/sample-household/recipes/`.
 2. Fill in `household/profile.json`, `household/preferences.json`, and `household/stores.json`.
 3. Add recipe markdown files under `recipes/` using `_recipe-template.md` or `assets/recipe-template.md`.
 4. Validate recipes with `python3 scripts/validate_recipes.py --data-root <path>`.
-5. Rebuild the catalog with `python3 scripts/build_recipe_query_index.py --data-root <path>`.
+5. Rebuild the catalog with `python3 scripts/build_recipe_query_index.py --data-root <path>`. The builder runs the same validation by default and exits nonzero on any failure; pass `--skip-validation` only as an escape hatch.
 6. Optionally add remembered inventory with `python3 scripts/manage_inventory.py --data-root <path> ...`.
 7. Query recipes or build plans.
 8. Optionally opt into manual weekly deal briefs with `python3 scripts/manage_deal_sources.py --data-root <path> ...`, then curate `deals/weekly-deal-brief-input.json` and render it with `python3 scripts/render_weekly_deal_brief.py --data-root <path>`.
@@ -51,7 +51,7 @@ cd /path/to/kitchen-compass
 - `household/preferences.json`
 - `household/stores.json`
 - `inventory/items.json`
-- at least one dinner or side recipe in `recipes/`
+- at least one dinner or side recipe in `recipes/` (the shipped sample-household ships with nine across multiple proteins so presets and pairing intel have real data to chew on)
 - optional `deals/weekly-deal-brief-input.json` for households that opt into manual weekly deal briefs
 - optional `history/events.jsonl`
 
