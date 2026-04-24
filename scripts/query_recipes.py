@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from contract import ACTIVE_ENGINE_MEAL_TYPES, ENUM_CHOICES
-from paths import FoodBrainPaths, resolve_data_root
+from paths import KitchenCompassPaths, resolve_data_root
 
 
 def load_catalog(path: Path) -> dict[str, Any]:
@@ -169,7 +169,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--text", help="Free-text search against title + snapshot + planning notes")
     parser.add_argument("--sort", default="title", choices=["title", "cooking_effort", "ingredient_friction", "cost", "status", "serving_profile", "core_protein"])
     parser.add_argument("--limit", type=int, default=20)
-    parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("--verbose", action="store_true", help="Render richer recipe output and print the resolved data root to stderr.")
     parser.add_argument("--pairs-with", help="Show pairing intelligence for a recipe slug or title")
     parser.add_argument("--show-view", choices=[
         "weeknight_easy_low_friction_dinners",
@@ -188,7 +188,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     payload = load_catalog(paths.generated_query_dir / "recipe-catalog.json")
 
     if args.pairs_with:

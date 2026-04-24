@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from paths import FoodBrainPaths, resolve_data_root, skill_root, write_atomic
+from paths import KitchenCompassPaths, resolve_data_root, skill_root, write_atomic
 
 SAMPLE_ROOT = skill_root() / "assets" / "sample-household"
 RECIPE_TEMPLATE = skill_root() / "assets" / "recipe-template.md"
@@ -35,7 +35,7 @@ def copy_sample_tree(target_root: Path, force: bool) -> list[str]:
 
 
 def bootstrap(data_root: Path, force: bool) -> list[str]:
-    paths = FoodBrainPaths.from_root(data_root)
+    paths = KitchenCompassPaths.from_root(data_root)
     paths.ensure_runtime_dirs()
 
     actions = copy_sample_tree(paths.data_root, force)
@@ -56,12 +56,13 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Create a portable Kitchen Compass household data tree from the skill assets.")
     parser.add_argument("--data-root", help="Target user-data directory. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.")
     parser.add_argument("--force", action="store_true", help="Overwrite existing sample files if they already exist.")
+    parser.add_argument("--verbose", action="store_true", help="Print the resolved data root to stderr.")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    data_root = resolve_data_root(args.data_root)
+    data_root = resolve_data_root(args.data_root, verbose=args.verbose)
     actions = bootstrap(data_root, force=args.force)
     print(f"Initialized Kitchen Compass data root: {data_root}")
     for action in actions:

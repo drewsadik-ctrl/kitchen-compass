@@ -10,7 +10,7 @@ from deals import (
     normalize_weekly_deal_input,
     render_weekly_deal_brief_markdown,
 )
-from paths import FoodBrainPaths, resolve_data_root, write_atomic
+from paths import KitchenCompassPaths, resolve_data_root, write_atomic
 
 
 
@@ -30,6 +30,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--data-root",
         help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.",
     )
+    parser.add_argument("--verbose", action="store_true", help="Print the resolved data root to stderr.")
     parser.add_argument("--input", help="Curated weekly deal brief input JSON. Defaults to deals/weekly-deal-brief-input.json under the data root.")
     parser.add_argument("--output-json", help="Write normalized brief JSON here. Defaults to generated/deals/weekly-deal-brief-latest.json.")
     parser.add_argument("--output-markdown", help="Write rendered markdown here. Defaults to generated/deals/weekly-deal-brief-latest.md.")
@@ -41,7 +42,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     stores_config = load_stores_config(paths)
 
     input_path = Path(args.input).expanduser().resolve() if args.input else paths.deal_brief_input_file

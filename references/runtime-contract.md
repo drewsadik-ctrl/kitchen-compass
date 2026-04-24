@@ -35,7 +35,7 @@ Treat these as generated and rebuildable:
 ## Runtime expectations
 
 - Create a new household root with `scripts/setup_household.py`.
-- Pass the root with `--data-root`, or set `FOOD_BRAIN_DATA_ROOT`.
+- Pass the root with `--data-root`, or set `KITCHEN_COMPASS_DATA_ROOT`. The legacy `FOOD_BRAIN_DATA_ROOT` env var is still honored but deprecated.
 - Recipe slugs come from markdown filename stems.
 - Run `scripts/validate_recipes.py --data-root <path>` after recipe edits and before rebuilding the query catalog.
 - Rebuild the query catalog after recipe edits before querying, planning, or recording history by title/slug.

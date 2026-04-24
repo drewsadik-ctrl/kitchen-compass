@@ -16,7 +16,7 @@ from contract import (
     WEEKLY_DEAL_SOURCE_TYPES,
     WEEKLY_DEAL_STORE_STATUSES,
 )
-from paths import FoodBrainPaths, write_atomic
+from paths import KitchenCompassPaths, write_atomic
 
 NON_WORD_RE = re.compile(r"[^a-z0-9]+")
 URL_RE = re.compile(r"^https?://", re.IGNORECASE)
@@ -246,14 +246,14 @@ def ensure_stores_config_shape(state: dict[str, Any] | None = None) -> dict[str,
 
 
 
-def load_stores_config(paths: FoodBrainPaths) -> dict[str, Any]:
+def load_stores_config(paths: KitchenCompassPaths) -> dict[str, Any]:
     path = paths.household_dir / "stores.json"
     if not path.exists():
         return ensure_stores_config_shape()
     return ensure_stores_config_shape(json.loads(path.read_text()))
 
 
-def load_raw_stores_config(paths: FoodBrainPaths) -> dict[str, Any]:
+def load_raw_stores_config(paths: KitchenCompassPaths) -> dict[str, Any]:
     path = paths.household_dir / "stores.json"
     if not path.exists():
         return {}
@@ -261,7 +261,7 @@ def load_raw_stores_config(paths: FoodBrainPaths) -> dict[str, Any]:
 
 
 
-def save_stores_config(paths: FoodBrainPaths, state: dict[str, Any]) -> None:
+def save_stores_config(paths: KitchenCompassPaths, state: dict[str, Any]) -> None:
     write_atomic(
         paths.household_dir / "stores.json",
         json.dumps(ensure_stores_config_shape(state), indent=2) + "\n",

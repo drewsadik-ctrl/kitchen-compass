@@ -18,12 +18,21 @@ from deals import (
     slugify,
     validate_stores_config,
 )
-from paths import FoodBrainPaths, resolve_data_root
+from paths import KitchenCompassPaths, resolve_data_root
 
 
 SOURCE_HELP = "One of: " + ", ".join(WEEKLY_DEAL_SOURCE_TYPES)
 STATUS_HELP = "One of: " + ", ".join(WEEKLY_DEAL_STORE_STATUSES)
 
+
+
+def _report(args: argparse.Namespace, summary: str, payload: dict) -> None:
+    if args.silent:
+        return
+    if args.quiet:
+        print(summary)
+        return
+    print(json.dumps(payload, indent=2))
 
 
 def build_store_payload(args: argparse.Namespace, existing: dict | None = None) -> dict:
@@ -91,7 +100,7 @@ def set_default_store(config: dict, store_id: str, enabled: bool) -> dict:
 
 
 
-def command_show(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_show(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     config = load_stores_config(paths)
     if args.json:
         print(json.dumps(config, indent=2))
@@ -111,7 +120,7 @@ def command_show(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
 
 
 
-def command_validate(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_validate(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     config = load_raw_stores_config(paths)
     errors = validate_stores_config(config)
     if errors:
@@ -123,18 +132,18 @@ def command_validate(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
 
 
 
-def command_enable(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_enable(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     config = load_stores_config(paths)
     config["weekly_deal_brief"]["enabled"] = args.enabled
     errors = validate_stores_config(config)
     if errors:
         raise SystemExit("\n".join(f"ERROR: {e}" for e in errors))
     save_stores_config(paths, config)
-    print(json.dumps(config["weekly_deal_brief"], indent=2))
+    _report(args, f"weekly deal brief enabled={args.enabled}", config["weekly_deal_brief"])
 
 
 
-def command_set_scan_schedule(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_set_scan_schedule(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     config = load_stores_config(paths)
     weekly = deepcopy(config.get("weekly_deal_brief") or {})
     if args.clear:
@@ -152,11 +161,11 @@ def command_set_scan_schedule(args: argparse.Namespace, paths: FoodBrainPaths) -
     if errors:
         raise SystemExit("\n".join(f"ERROR: {e}" for e in errors))
     save_stores_config(paths, config)
-    print(json.dumps(config["weekly_deal_brief"].get("scan_schedule", {}), indent=2))
+    _report(args, "scan schedule updated", config["weekly_deal_brief"].get("scan_schedule", {}))
 
 
 
-def command_add_store(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_add_store(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     if not args.label:
         raise SystemExit("--label is required")
     if not args.retailer:
@@ -173,11 +182,11 @@ def command_add_store(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
     if errors:
         raise SystemExit("\n".join(f"ERROR: {e}" for e in errors))
     save_stores_config(paths, updated)
-    print(json.dumps(store, indent=2))
+    _report(args, f"added deal store: {store['id']}", store)
 
 
 
-def command_set_store(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_set_store(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     config = load_stores_config(paths)
     existing = deal_store_by_id(config, args.store)
     if not existing:
@@ -208,7 +217,7 @@ def command_set_store(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
     if errors:
         raise SystemExit("\n".join(f"ERROR: {e}" for e in errors))
     save_stores_config(paths, updated)
-    print(json.dumps(updated_store, indent=2))
+    _report(args, f"updated deal store: {updated_store['id']}", updated_store)
 
 
 
@@ -247,6 +256,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--data-root",
         help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.",
     )
+    parser.add_argument("--verbose", action="store_true", help="Print the resolved data root to stderr.")
+    parser.add_argument("--quiet", action="store_true", help="Suppress the verbose JSON dump; print a one-line confirmation instead.")
+    parser.add_argument("--silent", action="store_true", help="Suppress all stdout output from mutation commands.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     show_parser = subparsers.add_parser("show", help="Show saved weekly deal brief store/source setup.")
@@ -283,7 +295,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
 
     if args.command == "show":
         command_show(args, paths)

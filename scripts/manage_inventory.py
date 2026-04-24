@@ -20,8 +20,17 @@ from inventory import (
     slugify,
     subtract_quantity,
 )
-from paths import FoodBrainPaths, resolve_data_root
+from paths import KitchenCompassPaths, resolve_data_root
 
+
+
+def _report(args: argparse.Namespace, summary: str, payload: dict[str, object]) -> None:
+    if args.silent:
+        return
+    if args.quiet:
+        print(summary)
+        return
+    print(json.dumps(payload, indent=2))
 
 
 def render_item(item: dict[str, object]) -> str:
@@ -83,7 +92,7 @@ def build_item_from_args(args: argparse.Namespace) -> dict[str, object]:
 
 
 
-def command_show(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_show(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     state = load_inventory_state(paths)
     items = state.get("items", [])
     if args.available_only:
@@ -99,18 +108,18 @@ def command_show(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
 
 
 
-def command_add(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_add(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     state = load_inventory_state(paths)
     item = build_item_from_args(args)
     ensure_unique_item_id(state, item["id"])
     next_state = replace_inventory_item(state, item)
     save_inventory_state(paths, next_state)
     append_inventory_transaction(paths, build_transaction("add", item, notes=args.notes))
-    print(json.dumps(item, indent=2))
+    _report(args, f"added inventory item: {item['id']}", item)
 
 
 
-def command_set(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_set(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     state = load_inventory_state(paths)
     item = inventory_item_by_id(state, args.item)
     if not item:
@@ -142,11 +151,11 @@ def command_set(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
     next_state = replace_inventory_item(state, updated)
     save_inventory_state(paths, next_state)
     append_inventory_transaction(paths, build_transaction("set", updated, before=item, notes=args.notes or ""))
-    print(json.dumps(updated, indent=2))
+    _report(args, f"updated inventory item: {updated['id']}", updated)
 
 
 
-def command_use(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
+def command_use(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     if not args.confirmed:
         raise SystemExit("Refusing to subtract inventory without --confirmed. Inventory changes must be explicit and user-confirmed.")
 
@@ -173,7 +182,7 @@ def command_use(args: argparse.Namespace, paths: FoodBrainPaths) -> None:
             },
         ),
     )
-    print(json.dumps(updated, indent=2))
+    _report(args, f"used inventory item: {updated['id']}", updated)
 
 
 
@@ -183,6 +192,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--data-root",
         help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.",
     )
+    parser.add_argument("--verbose", action="store_true", help="Print the resolved data root to stderr.")
+    parser.add_argument("--quiet", action="store_true", help="Suppress the verbose JSON dump; print a one-line confirmation instead.")
+    parser.add_argument("--silent", action="store_true", help="Suppress all stdout output from mutation commands.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     show_parser = subparsers.add_parser("show", help="Show saved inventory items.")
@@ -218,7 +230,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
 
     try:
         if args.command == "show":

@@ -14,7 +14,7 @@ from deals import (
     normalize_brief_source,
     save_weekly_deal_input,
 )
-from paths import FoodBrainPaths, resolve_data_root, write_atomic
+from paths import KitchenCompassPaths, resolve_data_root, write_atomic
 
 
 def build_store_brief_stub(week_of: str, store: dict) -> dict:
@@ -39,7 +39,7 @@ def write_stub(path: Path, payload: dict, force: bool) -> str:
 
 
 
-def build_scan_packet(paths: FoodBrainPaths, config: dict, week_of: str, store_ids: list[str], stub_statuses: dict[str, str]) -> dict:
+def build_scan_packet(paths: KitchenCompassPaths, config: dict, week_of: str, store_ids: list[str], stub_statuses: dict[str, str]) -> dict:
     weekly = config.get("weekly_deal_brief", {})
     stores = []
     for store_id in store_ids:
@@ -103,17 +103,20 @@ def render_scan_packet_markdown(packet: dict) -> str:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Prepare a weekly deal scan packet and per-store brief stubs for all selected stores.")
     parser.add_argument("--data-root", help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.")
+    parser.add_argument("--verbose", action="store_true", help="Print the resolved data root to stderr.")
     parser.add_argument("--week-of", help="Override the current week label, for example 2026-04-21.")
     parser.add_argument("--store", action="append", default=None, help="Optional store id filter. Repeat for multiple stores.")
     parser.add_argument("--force", action="store_true", help="Overwrite any existing per-store brief stubs.")
     parser.add_argument("--json", action="store_true", help="Print the scan packet as JSON instead of markdown.")
+    parser.add_argument("--quiet", action="store_true", help="Print a one-line confirmation instead of the full scan packet.")
+    parser.add_argument("--silent", action="store_true", help="Suppress all stdout output.")
     return parser.parse_args()
 
 
 
 def main() -> None:
     args = parse_args()
-    paths = FoodBrainPaths.from_root(resolve_data_root(args.data_root))
+    paths = KitchenCompassPaths.from_root(resolve_data_root(args.data_root, verbose=args.verbose))
     paths.ensure_runtime_dirs()
     config = load_stores_config(paths)
     selected_store_ids = args.store or default_weekly_deal_store_ids(config)
@@ -133,6 +136,11 @@ def main() -> None:
     write_atomic(paths.generated_deal_scan_file, json.dumps(packet, indent=2) + "\n")
     write_atomic(paths.generated_deal_scan_markdown_file, render_scan_packet_markdown(packet))
 
+    if args.silent:
+        return
+    if args.quiet:
+        print(f"prepared weekly deal scan for {week_of} across {len(selected_store_ids)} store(s)")
+        return
     if args.json:
         print(json.dumps(packet, indent=2))
     else:

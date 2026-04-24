@@ -42,13 +42,15 @@ Then run scripts from `scripts/` against a household data root.
 python3 scripts/setup_household.py --data-root /path/to/kitchen-compass-data
 ```
 
-This creates the canonical user-data layout and copies the sample household stub, the sample `burger-bowls.md` recipe, and `_recipe-template.md`.
+This creates the canonical user-data layout and copies the bundled sample recipes under `assets/sample-household/` plus `_recipe-template.md`. The legacy `FOOD_BRAIN_DATA_ROOT` env var still works but is deprecated — prefer `KITCHEN_COMPASS_DATA_ROOT`.
 
 ### Build the query catalog
 
 ```bash
 python3 scripts/build_recipe_query_index.py --data-root /path/to/kitchen-compass-data
 ```
+
+The index builder validates every recipe against the frozen contract before writing the catalog and exits nonzero on any failure. Pass `--skip-validation` to bypass in a pinch; normal usage should leave it on.
 
 ### Query recipes
 
@@ -96,6 +98,12 @@ python3 scripts/render_weekly_deal_brief.py --data-root /path/to/kitchen-compass
 python3 scripts/record_meal_history.py --data-root /path/to/kitchen-compass-data --event-type made --recipe burger-bowls
 ```
 
+Duplicate events — same `(date, recipe, meal_slot, event_type)` — are skipped by default with a warning. Pass `--allow-duplicate` to write anyway, or `--replace` to substitute the existing event in place.
+
+### Quiet / verbose flags
+
+Every script supports `--verbose` to print the resolved data root to stderr; alternatively set `KITCHEN_COMPASS_VERBOSE=1`. Mutation scripts (`manage_inventory`, `manage_deal_sources`, `record_meal_history`, `prepare_weekly_deal_scan`) support `--quiet` for a one-line confirmation and `--silent` for no stdout output.
+
 ## Workflow
 
 1. Initialize or inspect the user-data root.
@@ -111,4 +119,4 @@ python3 scripts/record_meal_history.py --data-root /path/to/kitchen-compass-data
 ## Assets
 
 - `assets/recipe-template.md` is the reusable authored template.
-- `assets/sample-household/` is seed content only. It now includes a sample `burger-bowls.md` dinner recipe; replace or expand it with real household data as needed.
+- `assets/sample-household/` is seed content only. It ships with nine sample recipes spanning four protein families, both `dinner` and `side` meal types, and a mix of statuses so presets and pairing intel have real data to work with. Replace or expand the set with real household data as needed.
