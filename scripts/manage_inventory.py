@@ -24,6 +24,15 @@ from paths import KitchenCompassPaths, resolve_data_root
 
 
 
+def _report(args: argparse.Namespace, summary: str, payload: dict[str, object]) -> None:
+    if args.silent:
+        return
+    if args.quiet:
+        print(summary)
+        return
+    print(json.dumps(payload, indent=2))
+
+
 def render_item(item: dict[str, object]) -> str:
     rules = item.get("match_rules", {})
     planning = item.get("planning", {})
@@ -106,7 +115,7 @@ def command_add(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     next_state = replace_inventory_item(state, item)
     save_inventory_state(paths, next_state)
     append_inventory_transaction(paths, build_transaction("add", item, notes=args.notes))
-    print(json.dumps(item, indent=2))
+    _report(args, f"added inventory item: {item['id']}", item)
 
 
 
@@ -142,7 +151,7 @@ def command_set(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
     next_state = replace_inventory_item(state, updated)
     save_inventory_state(paths, next_state)
     append_inventory_transaction(paths, build_transaction("set", updated, before=item, notes=args.notes or ""))
-    print(json.dumps(updated, indent=2))
+    _report(args, f"updated inventory item: {updated['id']}", updated)
 
 
 
@@ -173,7 +182,7 @@ def command_use(args: argparse.Namespace, paths: KitchenCompassPaths) -> None:
             },
         ),
     )
-    print(json.dumps(updated, indent=2))
+    _report(args, f"used inventory item: {updated['id']}", updated)
 
 
 
@@ -184,6 +193,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.",
     )
     parser.add_argument("--verbose", action="store_true", help="Print the resolved data root to stderr.")
+    parser.add_argument("--quiet", action="store_true", help="Suppress the verbose JSON dump; print a one-line confirmation instead.")
+    parser.add_argument("--silent", action="store_true", help="Suppress all stdout output from mutation commands.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     show_parser = subparsers.add_parser("show", help="Show saved inventory items.")

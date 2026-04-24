@@ -26,6 +26,15 @@ STATUS_HELP = "One of: " + ", ".join(WEEKLY_DEAL_STORE_STATUSES)
 
 
 
+def _report(args: argparse.Namespace, summary: str, payload: dict) -> None:
+    if args.silent:
+        return
+    if args.quiet:
+        print(summary)
+        return
+    print(json.dumps(payload, indent=2))
+
+
 def build_store_payload(args: argparse.Namespace, existing: dict | None = None) -> dict:
     base = deepcopy(existing or {})
     label = args.label if args.label is not None else base.get("label", "")
@@ -130,7 +139,7 @@ def command_enable(args: argparse.Namespace, paths: KitchenCompassPaths) -> None
     if errors:
         raise SystemExit("\n".join(f"ERROR: {e}" for e in errors))
     save_stores_config(paths, config)
-    print(json.dumps(config["weekly_deal_brief"], indent=2))
+    _report(args, f"weekly deal brief enabled={args.enabled}", config["weekly_deal_brief"])
 
 
 
@@ -152,7 +161,7 @@ def command_set_scan_schedule(args: argparse.Namespace, paths: KitchenCompassPat
     if errors:
         raise SystemExit("\n".join(f"ERROR: {e}" for e in errors))
     save_stores_config(paths, config)
-    print(json.dumps(config["weekly_deal_brief"].get("scan_schedule", {}), indent=2))
+    _report(args, "scan schedule updated", config["weekly_deal_brief"].get("scan_schedule", {}))
 
 
 
@@ -173,7 +182,7 @@ def command_add_store(args: argparse.Namespace, paths: KitchenCompassPaths) -> N
     if errors:
         raise SystemExit("\n".join(f"ERROR: {e}" for e in errors))
     save_stores_config(paths, updated)
-    print(json.dumps(store, indent=2))
+    _report(args, f"added deal store: {store['id']}", store)
 
 
 
@@ -208,7 +217,7 @@ def command_set_store(args: argparse.Namespace, paths: KitchenCompassPaths) -> N
     if errors:
         raise SystemExit("\n".join(f"ERROR: {e}" for e in errors))
     save_stores_config(paths, updated)
-    print(json.dumps(updated_store, indent=2))
+    _report(args, f"updated deal store: {updated_store['id']}", updated_store)
 
 
 
@@ -248,6 +257,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="Household data root. Defaults to ./kitchen-compass-data, except when run from the installed skill root it defaults to ../kitchen-compass-data so household data stays outside the skill.",
     )
     parser.add_argument("--verbose", action="store_true", help="Print the resolved data root to stderr.")
+    parser.add_argument("--quiet", action="store_true", help="Suppress the verbose JSON dump; print a one-line confirmation instead.")
+    parser.add_argument("--silent", action="store_true", help="Suppress all stdout output from mutation commands.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     show_parser = subparsers.add_parser("show", help="Show saved weekly deal brief store/source setup.")

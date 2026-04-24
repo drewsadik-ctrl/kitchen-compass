@@ -108,6 +108,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--store", action="append", default=None, help="Optional store id filter. Repeat for multiple stores.")
     parser.add_argument("--force", action="store_true", help="Overwrite any existing per-store brief stubs.")
     parser.add_argument("--json", action="store_true", help="Print the scan packet as JSON instead of markdown.")
+    parser.add_argument("--quiet", action="store_true", help="Print a one-line confirmation instead of the full scan packet.")
+    parser.add_argument("--silent", action="store_true", help="Suppress all stdout output.")
     return parser.parse_args()
 
 
@@ -134,6 +136,11 @@ def main() -> None:
     write_atomic(paths.generated_deal_scan_file, json.dumps(packet, indent=2) + "\n")
     write_atomic(paths.generated_deal_scan_markdown_file, render_scan_packet_markdown(packet))
 
+    if args.silent:
+        return
+    if args.quiet:
+        print(f"prepared weekly deal scan for {week_of} across {len(selected_store_ids)} store(s)")
+        return
     if args.json:
         print(json.dumps(packet, indent=2))
     else:

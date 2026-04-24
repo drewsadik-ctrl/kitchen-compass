@@ -85,6 +85,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--notes", default="")
     parser.add_argument("--show", action="store_true", help="Show recent events instead of appending a new one.")
     parser.add_argument("--limit", type=int, default=20)
+    parser.add_argument("--quiet", action="store_true", help="Print a one-line confirmation instead of the full event JSON.")
+    parser.add_argument("--silent", action="store_true", help="Suppress all stdout output.")
     duplicate_group = parser.add_mutually_exclusive_group()
     duplicate_group.add_argument("--allow-duplicate", action="store_true", help="Append even if an event with the same (date, recipe, meal_slot, event_type) already exists.")
     duplicate_group.add_argument("--replace", action="store_true", help="If a duplicate exists, rewrite the file so the new event replaces it.")
@@ -139,9 +141,16 @@ def main() -> None:
     if duplicate_idx is not None and args.replace:
         events[duplicate_idx] = event
         rewrite_events(history_path, events)
+        verb = "replaced"
     else:
         append_event(history_path, event)
+        verb = "recorded"
 
+    if args.silent:
+        return
+    if args.quiet:
+        print(f"{verb} history event: {event['date']} {event['recipe_slug']} ({event['event_type']})")
+        return
     print(json.dumps(event, indent=2, sort_keys=True))
 
 
